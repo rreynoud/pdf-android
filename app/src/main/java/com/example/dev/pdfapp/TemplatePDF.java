@@ -216,9 +216,16 @@ public class TemplatePDF {
 
                 File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "TemplatePDF.pdf");
 
+                if(file.exists()){
+                    Uri uri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", file);
 
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(uri, "application/pdf");
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    activity.startActivity(intent);
 
-                Uri uri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", file);
+                }
+
 
 //                Uri uri = Uri.fromFile(outputFile);
 
@@ -232,12 +239,7 @@ public class TemplatePDF {
 
 //                Uri uri= FileProvider.getUriForFile(context,BuildConfig.APPLICATION_ID , pdfFile);
 //
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(uri, "application/pdf");
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//
 
-                activity.startActivity(intent);
 //                activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.adobe.reader")));
             }catch (Exception e){
                 e.printStackTrace();
