@@ -72,9 +72,6 @@ class MainActivity : AppCompatActivity() {
         if(isExternalStorageWritable()){
             templatePDF.viewPDF(this)
 
-            share("asdfasdf")
-
-
         }else{
             println("asdfasdfasdf")
         }

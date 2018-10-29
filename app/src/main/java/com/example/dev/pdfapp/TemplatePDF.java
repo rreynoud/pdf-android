@@ -18,9 +18,11 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -30,6 +32,8 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import static android.support.v4.content.FileProvider.getUriForFile;
 
 public class TemplatePDF {
 
@@ -65,11 +69,10 @@ public class TemplatePDF {
 
     private void createFile(){
 
+        File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString());
 
 
-
-
-        File folder = new File(Environment.getExternalStorageDirectory().toString(), "PDF");
+        //File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "PDF");
 
         if(!folder.exists())
             folder.mkdirs();
@@ -205,24 +208,41 @@ public class TemplatePDF {
 
 
         if(pdfFile != null && pdfFile.exists()){
-            Uri uri = Uri.fromFile(pdfFile);
 
-
-            File file = new File(pdfFile.getPath());
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setDataAndType(Uri.fromFile(file), "application/pdf");
-            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//            startActivity(intent);
-
-//            Intent intent = new Intent(Intent.ACTION_VIEW);
-//            intent.setDataAndType(uri, "application/pdf");
 
             try {
-                //activity.startActivity(intent);
-//                activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.adobe.reader")));
-            }catch (ActivityNotFoundException e){
-                activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.adobe.reader")));
+                //Uri uri = Uri.fromFile(pdfFile);
 
+
+                File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "TemplatePDF.pdf");
+
+
+
+                Uri uri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", file);
+
+//                Uri uri = Uri.fromFile(outputFile);
+
+//                Intent share = new Intent();
+//                share.setAction(Intent.ACTION_SEND);
+//                share.setType("application/pdf");
+//                share.putExtra(Intent.EXTRA_STREAM, uri);
+//                share.setPackage("com.whatsapp");
+//
+//                activity.startActivity(share);
+
+//                Uri uri= FileProvider.getUriForFile(context,BuildConfig.APPLICATION_ID , pdfFile);
+//
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(uri, "application/pdf");
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//
+
+                activity.startActivity(intent);
+//                activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.adobe.reader")));
+            }catch (Exception e){
+                e.printStackTrace();
+//                activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.adobe.reader")));
+                System.out.println("FUDEU");
             }
 
         }
