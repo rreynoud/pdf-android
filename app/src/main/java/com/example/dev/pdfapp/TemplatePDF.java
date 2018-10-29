@@ -219,10 +219,16 @@ public class TemplatePDF {
                 if(file.exists()){
                     Uri uri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", file);
 
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(uri, "application/pdf");
+                    Intent intent = new Intent();
+                    intent.setAction(Intent.ACTION_SEND);
+                    intent.putExtra(Intent.EXTRA_STREAM, uri);
+                    intent.setType("application/pdf");
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    activity.startActivity(intent);
+
+                    //activity.startActivity(intent);
+                    activity.startActivity(Intent.createChooser(intent, null));
+
+
 
                 }
 
