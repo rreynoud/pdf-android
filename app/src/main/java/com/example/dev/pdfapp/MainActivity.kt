@@ -13,7 +13,7 @@ import java.util.ArrayList
 
 class MainActivity : AppCompatActivity() {
 
-    var header = arrayOf("Id", "Nombre", "Apellido")
+    var header = arrayOf("   ", "  ")
     var  shortText = "Hola"
     var  longText = "Nunca consideres el estudio como una obligación, sino como una oportunidad para penetrar en el bello y maravilloso mundo del saber"
     lateinit var templatePDF:TemplatePDF
@@ -59,11 +59,25 @@ class MainActivity : AppCompatActivity() {
         templatePDF = TemplatePDF(applicationContext)
         templatePDF.openDocument()
         templatePDF.addMetaData("clientes", "Ventas", "Marines")
-        templatePDF.addTitles("Tienda CodigoFacilito", "Clientes", "06/12/2018")
+        templatePDF.addTitles("Teorema-Sistemas", "Comprovante de venda", "Rafael Reynoud Benetti", "R$ 60,00")
 
-        templatePDF.addParagraph(shortText)
-        templatePDF.addParagraph(longText)
-        templatePDF.createTable(header, null)
+        templatePDF.addParagraph("Manteiga")
+        templatePDF.addParagraph("R$ 50,00     x1 R$ 50,00")
+
+        templatePDF.addParagraph("Produto_1")
+        templatePDF.addParagraph("R$ 10,00     x1 R$ 10,00")
+
+        templatePDF.addParagraph("")
+        templatePDF.addParagraph("Sub total    x1 R$ 60,00")
+        templatePDF.addParagraph("Desconto     x1 R$  0,00")
+        templatePDF.addParagraph("valor total  x1 R$ 60,00")
+        templatePDF.addParagraph("")
+
+        templatePDF.addParagraph("Vendedor            Jose")
+        templatePDF.addParagraph("Data                10/10/2018")
+
+
+        //templatePDF.createTable(header, null)
 
         templatePDF.closeDocument()
 

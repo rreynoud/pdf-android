@@ -28,12 +28,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
-
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
-
-import static android.support.v4.content.FileProvider.getUriForFile;
 
 public class TemplatePDF {
 
@@ -44,10 +39,11 @@ public class TemplatePDF {
     private Document document;
     private PdfWriter pdfWriter;
     private Paragraph paragraph;
-    private Font fTitle = new Font(Font.FontFamily.TIMES_ROMAN, 20, Font.BOLD);
-    private Font fSubTitle = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);
+    private Font fTitle = new Font(Font.FontFamily.TIMES_ROMAN, 16, Font.BOLD);
+    private Font fSubTitle = new Font(Font.FontFamily.TIMES_ROMAN, 16, Font.BOLD);
     private Font fText = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD);
     private Font fHighText = new Font(Font.FontFamily.TIMES_ROMAN, 15, Font.BOLD, BaseColor.RED);
+    private Font fTotalValue = new Font(Font.FontFamily.TIMES_ROMAN, 22, Font.BOLD, BaseColor.BLACK);
 
     public TemplatePDF(Context context) {
         this.context = context;
@@ -71,38 +67,12 @@ public class TemplatePDF {
 
         File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString());
 
-
-        //File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "PDF");
-
         if(!folder.exists())
             folder.mkdirs();
 
 
-        if(folder.exists()){
-            pdfFile = new File(folder, "TemplatePDF.pdf");
-        }
-
         if(folder.exists())
-            System.out.println("somo foda memo!");
-
-
-
-
-//        try {
-//            File root = new File(Environment.getExternalStorageDirectory(), "Notes");
-//            if (!root.exists()) {
-//                root.mkdirs();
-//            }
-//            File gpxfile = new File(root, "teste");
-//            FileWriter writer = new FileWriter(gpxfile);
-//            writer.append("sBody");
-//            writer.flush();
-//            writer.close();
-//            Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
+            pdfFile = new File(folder, "TemplatePDF.pdf");
 
     }
 
@@ -116,14 +86,15 @@ public class TemplatePDF {
         document.addAuthor(author);
     }
 
-    public void addTitles(String title, String subTitle, String date){
+    public void addTitles(String title, String subTitle, String client, String value){
 
         try {
 
             paragraph = new Paragraph();
             addChield(new Paragraph(title, fTitle));
             addChield(new Paragraph(subTitle, fSubTitle));
-            addChield(new Paragraph( "Generado: " + date, fHighText));
+            addChield(new Paragraph(  client, fHighText));
+            addChield(new Paragraph(  value, fTotalValue));
 
             paragraph.setSpacingAfter(30);
             document.add(paragraph);
@@ -143,10 +114,12 @@ public class TemplatePDF {
 
             if(clients == null){
                 clients = new ArrayList<>();
-                clients.add(new String[]{"1", "aa", "bb"});
-                clients.add(new String[]{"2", "aa2", "bb"});
-                clients.add(new String[]{"4", "aa3", "bb"});
-                clients.add(new String[]{"5", "aa5", "bb"});
+                clients.add(new String[]{"Manteiga", ""});
+                clients.add(new String[]{"R$ 50,00", "x1 R$50,00"});
+
+                clients.add(new String[]{"Produto_1", ""});
+                clients.add(new String[]{"R$ 10,00", "x1 R$10,00"});
+
             }
 
             paragraph = new Paragraph();
@@ -156,12 +129,12 @@ public class TemplatePDF {
             PdfPCell pdfPCell;
 
             int indexC=0;
-            while (indexC < header.length){
-                pdfPCell = new PdfPCell(new Phrase(header[indexC++]));
-                pdfPCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-                pdfPCell.setBackgroundColor(BaseColor.GREEN);
-                pdfPTable.addCell(pdfPCell);
-            }
+//            while (indexC < header.length){
+//                pdfPCell = new PdfPCell(new Phrase(header[indexC++]));
+//                pdfPCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+//                pdfPCell.setBackgroundColor(BaseColor.GREEN);
+//                pdfPTable.addCell(pdfPCell);
+//            }
 
 
             for(int indexR=0; indexR<clients.size(); indexR++){
@@ -169,7 +142,8 @@ public class TemplatePDF {
                 for(indexC=0; indexC<header.length; indexC++){
                     pdfPCell = new PdfPCell(new Phrase(row[indexC]));
                     pdfPCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-                    pdfPCell.setFixedHeight(40);
+                    pdfPCell.setFixedHeight(20);
+                    pdfPCell.setFixedHeight(0);
                     pdfPTable.addCell(pdfPCell);
                 }
             }
@@ -190,6 +164,7 @@ public class TemplatePDF {
             paragraph = new Paragraph(text, fText);
             paragraph.setSpacingAfter(5);
             paragraph.setSpacingBefore(5);
+            paragraph.setAlignment(Element.ALIGN_CENTER);
             document.add(paragraph);
 
         }catch (Exception e){
@@ -211,8 +186,6 @@ public class TemplatePDF {
 
 
             try {
-                //Uri uri = Uri.fromFile(pdfFile);
-
 
                 File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "TemplatePDF.pdf");
 
@@ -220,14 +193,17 @@ public class TemplatePDF {
                     Uri uri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", file);
 
                     Intent intent = new Intent();
-                    intent.setAction(Intent.ACTION_SEND);
                     intent.putExtra(Intent.EXTRA_STREAM, uri);
                     intent.setType("application/pdf");
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-                    //activity.startActivity(intent);
-                    activity.startActivity(Intent.createChooser(intent, null));
 
+                        intent.setAction(Intent.ACTION_SEND);
+                        activity.startActivity(Intent.createChooser(intent, null));
+
+
+//                        intent.setAction(Intent.ACTION_VIEW);
+//                        activity.startActivity(intent);
 
 
                 }
