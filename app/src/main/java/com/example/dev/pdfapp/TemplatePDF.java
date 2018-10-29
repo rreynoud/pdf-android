@@ -14,12 +14,21 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
 
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Environment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
+
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class TemplatePDF {
@@ -55,12 +64,42 @@ public class TemplatePDF {
 
 
     private void createFile(){
+
+
+
+
+
         File folder = new File(Environment.getExternalStorageDirectory().toString(), "PDF");
 
         if(!folder.exists())
-            folder.mkdir();
+            folder.mkdirs();
 
-        pdfFile = new File(folder, "TemplatePDF.pdf");
+
+        if(folder.exists()){
+            pdfFile = new File(folder, "TemplatePDF.pdf");
+        }
+
+        if(folder.exists())
+            System.out.println("somo foda memo!");
+
+
+
+
+//        try {
+//            File root = new File(Environment.getExternalStorageDirectory(), "Notes");
+//            if (!root.exists()) {
+//                root.mkdirs();
+//            }
+//            File gpxfile = new File(root, "teste");
+//            FileWriter writer = new FileWriter(gpxfile);
+//            writer.append("sBody");
+//            writer.flush();
+//            writer.close();
+//            Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
 
     }
 
@@ -92,9 +131,20 @@ public class TemplatePDF {
 
     }
 
+
+
     public void createTable(String[] header, ArrayList<String[]> clients){
 
         try{
+
+
+            if(clients == null){
+                clients = new ArrayList<>();
+                clients.add(new String[]{"1", "aa", "bb"});
+                clients.add(new String[]{"2", "aa2", "bb"});
+                clients.add(new String[]{"4", "aa3", "bb"});
+                clients.add(new String[]{"5", "aa5", "bb"});
+            }
 
             paragraph = new Paragraph();
             paragraph.setFont(fText);
@@ -113,7 +163,7 @@ public class TemplatePDF {
 
             for(int indexR=0; indexR<clients.size(); indexR++){
                 String[] row = clients.get(indexR);
-                for(indexC=0; indexC<clients.size(); indexC++){
+                for(indexC=0; indexC<header.length; indexC++){
                     pdfPCell = new PdfPCell(new Phrase(row[indexC]));
                     pdfPCell.setHorizontalAlignment(Element.ALIGN_CENTER);
                     pdfPCell.setFixedHeight(40);
@@ -150,5 +200,38 @@ public class TemplatePDF {
         paragraph.add(childParagraph);
     }
 
+
+    public void viewPDF(Activity activity){
+
+
+        if(pdfFile != null && pdfFile.exists()){
+            Uri uri = Uri.fromFile(pdfFile);
+
+
+            File file = new File(pdfFile.getPath());
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(Uri.fromFile(file), "application/pdf");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+//            startActivity(intent);
+
+//            Intent intent = new Intent(Intent.ACTION_VIEW);
+//            intent.setDataAndType(uri, "application/pdf");
+
+            try {
+                //activity.startActivity(intent);
+//                activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.adobe.reader")));
+            }catch (ActivityNotFoundException e){
+                activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.adobe.reader")));
+
+            }
+
+        }
+
+
+//        Intent intent = new Intent(context, ViewPDFActivity.class);
+//        intent.putExtra("path", pdfFile.getAbsolutePath());
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        context.startActivity(intent);
+    }
 
 }
